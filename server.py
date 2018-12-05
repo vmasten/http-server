@@ -27,19 +27,22 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 msg = bessie.milk((parsed_qs['msg'][0]))
                 self.wfile.write(bytes(msg, 'utf-8'))
                 return
+
             self.send_response(400)
+            self.end_headers()
             return
 
         self.send_response(404)
         self.end_headers()
 
-
-    def do_HEAD(self):
-        pass
-
     def do_POST(self):
         parsed_path = urlparse(self.path)
         parsed_qs = parse_qs(parsed_path.query)
+
+        if parsed_path.path == '/':
+            self.send_response(400)
+            self.end_headers()
+            return
 
         if parsed_path.path == '/cow':
             if 'msg' in parsed_qs:
@@ -54,6 +57,47 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
                 return
 
             self.send_response(400)
+            self.end_headers()
+            return
+
+        self.send_response(404)
+        self.end_headers()
+
+    def do_HEAD(self):
+        parsed_path = urlparse(self.path)
+        parsed_qs = parse_qs(parsed_path.query)
+
+        if parsed_path.path == '/':
+            self.send_response(400)
+            self.end_headers()
+            return
+
+        if parsed_path.path == '/cow':
+            if 'msg' in parsed_qs:
+                self.send_response(405)
+                self.end_headers()
+                return
+
+        self.send_response(404)
+        self.end_headers()
+
+    def do_PUT(self):
+        parsed_path = urlparse(self.path)
+        parsed_qs = parse_qs(parsed_path.query)
+
+        if parsed_path.path == '/':
+            self.send_response(400)
+            self.end_headers()
+            return
+
+        if parsed_path.path == '/cow':
+            if 'msg' in parsed_qs:
+                self.send_response(405)
+                self.end_headers()
+                return
+
+        self.send_response(404)
+        self.end_headers()
 
 
 def create_server():
